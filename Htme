@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>나의 일기 블로그</title>
+  <style>
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #4a90e2;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    main {
+      max-width: 700px;
+      margin: 30px auto;
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      resize: none;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #357ABD;
+    }
+
+    .entry {
+      background-color: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    .entry h3 {
+      margin: 0 0 5px;
+    }
+
+    .entry p {
+      margin: 5px 0;
+      white-space: pre-wrap;
+    }
+
+    .date {
+      font-size: 13px;
+      color: gray;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <header>🌿 나의 일기 블로그</header>
+
+  <main>
+    <form id="diaryForm">
+      <input type="text" id="title" placeholder="오늘의 제목을 입력하세요" required />
+      <textarea id="content" rows="5" placeholder="오늘의 일기를 써보세요..." required></textarea>
+      <button type="submit">저장하기</button>
+    </form>
+
+    <section id="entries"></section>
+  </main>
+
+  <script>
+    const form = document.getElementById("diaryForm");
+    const entriesSection = document.getElementById("entries");
+
+    // 저장된 일기 불러오기
+    const loadEntries = () => {
+      const saved = JSON.parse(localStorage.getItem("diaryEntries")) || [];
+      entriesSection.innerHTML = "";
+      saved.forEach(entry => addEntryToPage(entry));
+    };
+
+    // 새 일기 저장
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const title = document.getElementById("title").value.trim();
+      const content = document.getElementById("content").value.trim();
+      if (!title || !content) return;
+
+      const newEntry = {
+        title,
+        content,
+        date: new Date().toLocaleString()
+      };
+
+      const entries = JSON.parse(localStorage.getItem("diaryEntries")) || [];
+      entries.unshift(newEntry); // 최신순으로 추가
+      localStorage.setItem("diaryEntries", JSON.stringify(entries));
+
+      addEntryToPage(newEntry);
+      form.reset();
+    });
+
+    // 일기 항목을 페이지에 추가
+    const addEntryToPage = (entry) => {
+      const div = document.createElement("div");
+      div.classList.add("entry");
+      div.innerHTML = `
+        <h3>${entry.title}</h3>
+        <p>${entry.content}</p>
+        <div class="date">${entry.date}</div>
+      `;
+      entriesSection.appendChild(div);
+    };
+
+    // 페이지 로드시 저장된 일기 표시
+    loadEntries();
+  </script>
+</body>
+</html>
